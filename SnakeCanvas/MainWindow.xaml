@@ -5,8 +5,30 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SnakeCanvas"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        SizeToContent="WidthAndHeight"
+        Title="SnakeCanvas">
+
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Name="GameInfo" 
+                   Height="30" 
+                   Background="Gray" Foreground="White"
+                   FontSize="21" TextAlignment="Center">
+            SnakeCanvas
+        </TextBlock>
+
+        <Canvas Grid.Row="1" Name="GameCanvas" 
+                Height="400" Width="400"/>
+
+        <Button Grid.Row="2" Click="Button_Click"
+                Height="30">Iniciar</Button>
     </Grid>
+    
+
+
 </Window>
