@@ -23,9 +23,9 @@
         </TextBlock>
 
         <Canvas Grid.Row="1" Name="GameCanvas" 
-                Height="400" Width="400"
+                Height="386" Width="386"
                 Background="WhiteSmoke">
-
+<!--
             <Ellipse Canvas.Left="200" Canvas.Bottom="300"
                      Height="10" Width="10"
                      Fill="Crimson" Stroke="PeachPuff"/>
@@ -33,21 +33,22 @@
             <Rectangle Canvas.Left="195" Canvas.Bottom="100"
                        Height="10" Width="10"
                        Fill="RosyBrown" Stroke="PaleVioletRed"/>
-            <Rectangle Canvas.Left="184" Canvas.Bottom="100"
+            <Rectangle Canvas.Left="183" Canvas.Bottom="100"
                        Height="10" Width="10"
                        Fill="LightGreen" Stroke="YellowGreen"/>
-            <Rectangle Canvas.Left="173" Canvas.Bottom="100"
+            <Rectangle Canvas.Left="171" Canvas.Bottom="100"
                        Height="10" Width="10"
                        Fill="LightGreen" Stroke="YellowGreen"/>
-            <Rectangle Canvas.Left="162" Canvas.Bottom="100"
+            <Rectangle Canvas.Left="159" Canvas.Bottom="100"
                        Height="10" Width="10"
                        Fill="LightGreen" Stroke="YellowGreen"/>
-            <Rectangle Canvas.Left="151" Canvas.Bottom="100"
+            <Rectangle Canvas.Left="147" Canvas.Bottom="100"
                        Height="10" Width="10"
                        Fill="LightGreen" Stroke="YellowGreen"/>
+-->
         </Canvas>
 
-        <Button Grid.Row="2" Margin="0,2" Click="Button_Click"
+        <Button Grid.Row="2" Margin="0,5,0,0" Click="Button_Click"
                 Height="30" FontSize="20">Iniciar</Button>
     </Grid>
     
