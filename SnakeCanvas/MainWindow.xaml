@@ -6,9 +6,9 @@
         xmlns:local="clr-namespace:SnakeCanvas"
         mc:Ignorable="d"
         SizeToContent="WidthAndHeight"
-        Title="SnakeCanvas">
+        Title="SnakeCanvas" Background="Gray">
 
-    <Grid>
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
@@ -23,12 +23,32 @@
         </TextBlock>
 
         <Canvas Grid.Row="1" Name="GameCanvas" 
-                Height="400" Width="400"/>
+                Height="400" Width="400"
+                Background="WhiteSmoke">
 
-        <Button Grid.Row="2" Click="Button_Click"
-                Height="30">Iniciar</Button>
+            <Ellipse Canvas.Left="200" Canvas.Bottom="300"
+                     Height="10" Width="10"
+                     Fill="Crimson" Stroke="PeachPuff"/>
+
+            <Rectangle Canvas.Left="195" Canvas.Bottom="100"
+                       Height="10" Width="10"
+                       Fill="RosyBrown" Stroke="PaleVioletRed"/>
+            <Rectangle Canvas.Left="184" Canvas.Bottom="100"
+                       Height="10" Width="10"
+                       Fill="LightGreen" Stroke="YellowGreen"/>
+            <Rectangle Canvas.Left="173" Canvas.Bottom="100"
+                       Height="10" Width="10"
+                       Fill="LightGreen" Stroke="YellowGreen"/>
+            <Rectangle Canvas.Left="162" Canvas.Bottom="100"
+                       Height="10" Width="10"
+                       Fill="LightGreen" Stroke="YellowGreen"/>
+            <Rectangle Canvas.Left="151" Canvas.Bottom="100"
+                       Height="10" Width="10"
+                       Fill="LightGreen" Stroke="YellowGreen"/>
+        </Canvas>
+
+        <Button Grid.Row="2" Margin="0,2" Click="Button_Click"
+                Height="30" FontSize="20">Iniciar</Button>
     </Grid>
     
-
-
 </Window>
