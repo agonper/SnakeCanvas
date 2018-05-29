@@ -12,40 +12,26 @@ namespace SnakeCanvas
 {
     class FoodSpawner
     {
-        public static readonly Point TheVoid = new Point(-1, -1);
 
         private Random random = new Random();
 
         private Canvas gameCanvas;
+        private GameGrid gameGrid;
         private int foodSize;
 
-        private int[] validXPositions;
-        private int[] validYPositions;
-
-        public FoodSpawner(Canvas gameCanvas, int foodSize, int margin)
+        public FoodSpawner(Canvas gameCanvas, GameGrid gameGrid)
         {
             this.gameCanvas = gameCanvas;
-            this.foodSize = foodSize;
-
-            validXPositions = IntRange(margin, (int)gameCanvas.Width, foodSize + margin);
-            validYPositions = IntRange(margin, (int)gameCanvas.Height, foodSize + margin);
+            this.gameGrid = gameGrid;
+            this.foodSize = gameGrid.CellSize;
         }
 
-        public Point SpawnFood(ISet<Point> forbiddenPoints, int spawnRetries=10)
+        public bool SpawnFood()
         {
-            for (int retry = 0; retry < spawnRetries; retry++)
-            {
-                var xIndex = random.Next(validXPositions.Length);
-                var yIndex = random.Next(validYPositions.Length);
-
-                var spawnPoint = new Point() { X = validXPositions[xIndex], Y = validYPositions[yIndex] };
-                if (!forbiddenPoints.Contains(spawnPoint))
-                {
-                    SpawnFoodAt(spawnPoint);
-                    return spawnPoint;
-                }
-            }
-            return TheVoid;
+            Point spawnPoint = gameGrid.ClaimRandomCell();
+            if (spawnPoint == GameGrid.TheVoid) return false;
+            SpawnFoodAt(spawnPoint);
+            return true;
         }
 
         private void SpawnFoodAt(Point point)
@@ -62,13 +48,6 @@ namespace SnakeCanvas
             Canvas.SetBottom(food, point.Y);
 
             gameCanvas.Children.Add(food);
-        }
-
-        private int[] IntRange(int start, int end, int step)
-        {
-            var ints = new List<int>();
-            for (var i = start; i < end; i += step) { ints.Add(i); }
-            return ints.ToArray();
         }
     }
 }

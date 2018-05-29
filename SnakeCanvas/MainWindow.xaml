@@ -26,9 +26,6 @@
                 Height="386" Width="386"
                 Background="WhiteSmoke">
 <!--
-            <Ellipse Canvas.Left="200" Canvas.Bottom="300"
-                     Height="10" Width="10"
-                     Fill="Crimson" Stroke="PeachPuff"/>
 
             <Rectangle Canvas.Left="195" Canvas.Bottom="100"
                        Height="10" Width="10"

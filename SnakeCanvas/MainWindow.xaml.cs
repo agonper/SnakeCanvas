@@ -27,9 +27,8 @@ namespace SnakeCanvas
         private static readonly int gameObjectMargin = 2;
 
         DispatcherTimer dispatchTimer;
+        GameGrid gameGrid;
         FoodSpawner foodSpawner;
-
-        ISet<Point> occupiedPoints = new HashSet<Point>();
 
         public MainWindow()
         {
@@ -40,17 +39,17 @@ namespace SnakeCanvas
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             dispatchTimer = new DispatcherTimer() { Interval = new TimeSpan(0, 0, 0, 0, gameSpeed) };
-            foodSpawner = new FoodSpawner(GameCanvas, gameObjectSize, gameObjectMargin);
+            gameGrid = new GameGrid((int)GameCanvas.Width, (int)GameCanvas.Height, gameObjectSize, gameObjectMargin);
+            foodSpawner = new FoodSpawner(GameCanvas, gameGrid);
+            foodSpawner.SpawnFood();
 
             dispatchTimer.Tick += DispatchTimer_Tick;
         }
 
         private void DispatchTimer_Tick(object sender, EventArgs e)
         {
-            var newFoodPoint = foodSpawner.SpawnFood(occupiedPoints);
-
-            if (newFoodPoint != FoodSpawner.TheVoid)
-                occupiedPoints.Add(newFoodPoint);
+            foodSpawner.SpawnFood();
+            GameInfo.Text = string.Format("Celdas restantes: {0}", gameGrid.RemainingCellCount);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
