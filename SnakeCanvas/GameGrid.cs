@@ -9,7 +9,7 @@ namespace SnakeCanvas
 {
     class GameGrid
     {
-        public static readonly Point TheVoid = new Point(-1, -1);
+        public static readonly Cell TheVoid = new Cell(-1, -1);
 
 
 
@@ -39,56 +39,57 @@ namespace SnakeCanvas
             validYPositions = IntRange(cellMargin, height, CellFullSize);
         }
 
-        public Point ClaimRandomCell(int retries = 10)
+        public Cell ClaimRandomCell(int retries = 10)
         {
             for (int retry = 0; retry < retries; retry++)
             {
                 var xIndex = random.Next(validXPositions.Length);
                 var yIndex = random.Next(validYPositions.Length);
 
-                var cellPoint = new Point() { X = validXPositions[xIndex], Y = validYPositions[yIndex] };
+                var cellPoint = new Cell(validXPositions[xIndex], validYPositions[yIndex]);
                 if (ClaimCell(cellPoint)) return cellPoint;
             }
             return TheVoid;
         }
 
-        public bool ClaimCell(Point cellCoords)
+        public bool ClaimCell(Cell cell)
         {
-            if (occupiedCoordinates.Contains(cellCoords)) return false;
-            occupiedCoordinates.Add(cellCoords);
+            if (occupiedCoordinates.Contains(cell.Coordinates)) return false;
+            occupiedCoordinates.Add(cell.Coordinates);
             return true;
         }
 
-        public void UnclaimCell(Point cellCoords)
+        public void UnclaimCell(Cell cell)
         {
-            occupiedCoordinates.Remove(cellCoords);
+            occupiedCoordinates.Remove(cell.Coordinates);
         }
 
-        public Point GetNeighbourCell(Point cell, Directions direction)
+        public Cell GetNeighbourCell(Cell cell, Directions direction)
         {
-            Point neighbour = new Point(cell.X, cell.Y);
+            var coords = cell.Coordinates;
+            var neighbourCoords = new Point(coords.X, coords.Y);
             switch (direction)
             {
                 case Directions.NORTH:
-                    neighbour.Y += CellFullSize;
+                    neighbourCoords.Y += CellFullSize;
                     break;
                 case Directions.SOUTH:
-                    neighbour.Y -= CellFullSize;
+                    neighbourCoords.Y -= CellFullSize;
                     break;
                 case Directions.EAST:
-                    neighbour.X += CellFullSize;
+                    neighbourCoords.X += CellFullSize;
                     break;
                 case Directions.WEST:
-                    neighbour.X -= CellFullSize;
+                    neighbourCoords.X -= CellFullSize;
                     break;
             }
 
-            if (neighbour.X < 0 ||
-                neighbour.X >= Width ||
-                neighbour.Y < 0 ||
-                neighbour.Y >= Height)
+            if (neighbourCoords.X < 0 ||
+                neighbourCoords.X >= Width ||
+                neighbourCoords.Y < 0 ||
+                neighbourCoords.Y >= Height)
                 return TheVoid;
-            return neighbour;
+            return new Cell((int)neighbourCoords.X, (int)neighbourCoords.Y);
         }
 
         private int[] IntRange(int start, int end, int step)
@@ -96,6 +97,27 @@ namespace SnakeCanvas
             var ints = new List<int>();
             for (var i = start; i < end; i += step) { ints.Add(i); }
             return ints.ToArray();
+        }
+
+        public class Cell
+        {
+            public Point Coordinates { get; private set; }
+
+            public Cell(int x, int y)
+            {
+                Coordinates = new Point(x, y);
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is Cell cell &&
+                       EqualityComparer<Point>.Default.Equals(Coordinates, cell.Coordinates);
+            }
+
+            public override int GetHashCode()
+            {
+                return -1484672504 + EqualityComparer<Point>.Default.GetHashCode(Coordinates);
+            }
         }
     }
 

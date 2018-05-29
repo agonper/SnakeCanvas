@@ -14,40 +14,37 @@ namespace SnakeCanvas
     {
         private static readonly Brush headColor = Brushes.RosyBrown;
         private static readonly Brush headBorderColor = Brushes.PaleVioletRed;
-        private static readonly Brush bodyColor = Brushes.LightGreen;
-        private static readonly Brush bodyBorderColor = Brushes.YellowGreen;
+        private static readonly Brush bodyBlockColor = Brushes.LightGreen;
+        private static readonly Brush bodyBlockBorderColor = Brushes.YellowGreen;
 
-        private static readonly Point initialHeadPosition = new Point() { X = 194, Y = 98 };
+        private static readonly GameGrid.Cell initialHeadPosition = new GameGrid.Cell(194, 98);
         private static readonly Directions initialDirection = Directions.EAST;
-        private static readonly int initialBodyParts = 4;
-
-        public Point HeadPosition { get; private set; }
-        public Directions Direction { get; private set; }
+        private static readonly int initialBodyBlocks = 1;
 
         private Canvas gameCanvas;
         private GameGrid gameGrid;
         private int partSize;
 
-        private Rectangle head;
-        private List<Rectangle> bodyParts = new List<Rectangle>();
-        private List<Point> bodyPartsCells = new List<Point>();
+        private BodyPart head;
+        private List<BodyPart> bodyBlocks = new List<BodyPart>();
+        public Directions direction;
 
         public Snake(Canvas gameCanvas, GameGrid gameGrid)
         {
             this.gameCanvas = gameCanvas;
             this.gameGrid = gameGrid;
-            Direction = initialDirection;
+            direction = initialDirection;
             partSize = gameGrid.CellSize;
         }
 
         public void Spawn()
         {
             RenderHeadAt(initialHeadPosition);
-            var lastBodyPartPosition = HeadPosition;
-            for (var bp = 0; bp < initialBodyParts; bp++)
+            var lastBodyPartPosition = head.Cell;
+            for (var bp = 0; bp < initialBodyBlocks; bp++)
             {
                 lastBodyPartPosition = gameGrid.GetNeighbourCell(lastBodyPartPosition, initialDirection.Opposite());
-                RenderBodPartyAt(lastBodyPartPosition);
+                RenderBodyBlockAt(lastBodyPartPosition);
             }
         }
 
@@ -56,88 +53,105 @@ namespace SnakeCanvas
             var nextHeadPosition = NextHeadPosition();
             
             if (!grow)
-                RemoveLastBodyPart();
+                RemoveLastBodyBlock();
 
-            TransformHeadIntoBodyPart();
+            head.TurnIntoBodyBlock();
+            bodyBlocks.Insert(0, head);
             RenderHeadAt(nextHeadPosition);
         }
 
-        public Point NextHeadPosition()
+        public GameGrid.Cell NextHeadPosition()
         {
-            return gameGrid.GetNeighbourCell(HeadPosition, Direction);
+            return gameGrid.GetNeighbourCell(head.Cell, direction);
         }
 
         public void SteerLeft()
         {
-            Direction = Direction.Left();
+            direction = direction.Left();
         }
 
         public void SteerRight()
         {
-            Direction = Direction.Right();
+            direction = direction.Right();
         }
 
-        private bool RenderHeadAt(Point cell)
+        private bool RenderHeadAt(GameGrid.Cell cell)
         {            
-            var head = CreatePart(headColor, headBorderColor);
-            var rendered = RenderPartAt(cell, head);
+            var head = BodyPart.CreateHead(this, cell);
+            var rendered = head.Render();
             if (rendered)
-            {
-                HeadPosition = cell;
                 this.head = head;
-            }
             return rendered;
         }
 
-        private bool RenderBodPartyAt(Point cell)
+        private bool RenderBodyBlockAt(GameGrid.Cell cell)
         {
-            var bodyPart = CreatePart(bodyColor, bodyBorderColor);
-            var rendered = RenderPartAt(cell, bodyPart);
+            var bodyBlock = BodyPart.CreateBodyBlock(this, cell);
+            var rendered = bodyBlock.Render();
             if (rendered)
             {
-                bodyParts.Add(bodyPart);
-                bodyPartsCells.Add(cell);
+                bodyBlocks.Add(bodyBlock);
             }
             return rendered;
         }
 
-        private bool RenderPartAt(Point cell, Rectangle part)
+        private void RemoveLastBodyBlock()
         {
-            if (!gameGrid.ClaimCell(cell)) return false;
-            Canvas.SetLeft(part, cell.X);
-            Canvas.SetBottom(part, cell.Y);
-            gameCanvas.Children.Add(part);
-            return true;
+            var lastBodyBlock = bodyBlocks.Last();
+            bodyBlocks.Remove(lastBodyBlock);
+            lastBodyBlock.Remove();
         }
 
-        private Rectangle CreatePart(Brush color, Brush borderColor)
+        private class BodyPart
         {
-            return new Rectangle()
+            public Rectangle Shape { get; private set; }
+            public GameGrid.Cell Cell { get; private set; }
+
+            private Snake snake;
+
+            public static BodyPart CreateHead(Snake snake, GameGrid.Cell gridCell)
             {
-                Height = partSize,
-                Width = partSize,
-                Fill = color,
-                Stroke = borderColor
-            };
-        }
+                return new BodyPart(snake, headColor, headBorderColor, gridCell);
+            }
 
-        private void TransformHeadIntoBodyPart()
-        {
-            head.Fill = bodyColor;
-            head.Stroke = bodyBorderColor;
-            bodyParts.Insert(0, head);
-            bodyPartsCells.Insert(0, HeadPosition);
-        }
+            public static BodyPart CreateBodyBlock(Snake snake, GameGrid.Cell gridCell)
+            {
+                return new BodyPart(snake, bodyBlockColor, bodyBlockBorderColor, gridCell);
+            }
 
-        private void RemoveLastBodyPart()
-        {
-            var lastBodyPart = bodyParts.Last();
-            bodyParts.Remove(lastBodyPart);
+            private BodyPart(Snake snake, Brush color, Brush borderColor, GameGrid.Cell gridCell)
+            {
+                Shape = new Rectangle()
+                {
+                    Height = snake.partSize,
+                    Width = snake.partSize,
+                    Fill = color,
+                    Stroke = borderColor
+                };
+                Cell = gridCell;
+                this.snake = snake;
+            }
 
-            gameCanvas.Children.Remove(lastBodyPart);
+            public bool Render()
+            {
+                if (!snake.gameGrid.ClaimCell(Cell)) return false;
+                Canvas.SetLeft(Shape, Cell.Coordinates.X);
+                Canvas.SetBottom(Shape, Cell.Coordinates.Y);
+                snake.gameCanvas.Children.Add(Shape);
+                return true;
+            }
 
-            gameGrid.UnclaimCell(bodyPartsCells.Last());
-            bodyPartsCells.Remove(bodyPartsCells.Last());
+            public void Remove()
+            {
+                snake.gameCanvas.Children.Remove(Shape);
+                snake.gameGrid.UnclaimCell(Cell);
+            }
+
+            public void TurnIntoBodyBlock()
+            {
+                Shape.Fill = bodyBlockColor;
+                Shape.Stroke = bodyBlockBorderColor;
+            }
         }
     }
 }

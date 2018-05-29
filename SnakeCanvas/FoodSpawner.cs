@@ -12,12 +12,15 @@ namespace SnakeCanvas
 {
     class FoodSpawner
     {
+        private static readonly int simultaneousFood = 1;
 
-        private Random random = new Random();
+        private readonly Random random = new Random();
 
         private Canvas gameCanvas;
         private GameGrid gameGrid;
         private int foodSize;
+
+        private Dictionary<GameGrid.Cell, Food> spawnedFood = new Dictionary<GameGrid.Cell, Food>();
 
         public FoodSpawner(Canvas gameCanvas, GameGrid gameGrid)
         {
@@ -26,28 +29,57 @@ namespace SnakeCanvas
             foodSize = gameGrid.CellSize;
         }
 
-        public bool SpawnFood()
+        public void SpawnFood()
         {
-            Point spawnPoint = gameGrid.ClaimRandomCell();
-            if (spawnPoint == GameGrid.TheVoid) return false;
-            SpawnFoodAt(spawnPoint);
+            if (spawnedFood.Count >= simultaneousFood) return;
+
+            GameGrid.Cell spawnPoint = gameGrid.ClaimRandomCell();
+            if (spawnPoint == GameGrid.TheVoid) return;
+            var food = new Food(this, spawnPoint);
+            food.Render();
+            spawnedFood.Add(food.Cell, food);
+        }
+
+        public bool IsFood(GameGrid.Cell cell)
+        {
+            if (!spawnedFood.ContainsKey(cell)) return false;
+            var food = spawnedFood[cell];
+            food.Remove();
             return true;
         }
 
-        private void SpawnFoodAt(Point point)
+        private class Food
         {
-            var food = new Ellipse()
+            public Ellipse Shape { get; private set; }
+            public GameGrid.Cell Cell { get; private set; }
+
+            private FoodSpawner spawner;
+
+            public Food(FoodSpawner spawner, GameGrid.Cell gridCell)
             {
-                Height = foodSize,
-                Width = foodSize,
-                Fill = Brushes.Crimson,
-                Stroke = Brushes.PeachPuff
-            };
+                Shape = new Ellipse()
+                {
+                    Height = spawner.foodSize,
+                    Width = spawner.foodSize,
+                    Fill = Brushes.Crimson,
+                    Stroke = Brushes.PeachPuff
+                };
+                Cell = gridCell;
+                this.spawner = spawner;
+            }
 
-            Canvas.SetLeft(food, point.X);
-            Canvas.SetBottom(food, point.Y);
+            public void Render()
+            {
+                Canvas.SetLeft(Shape, Cell.Coordinates.X);
+                Canvas.SetBottom(Shape, Cell.Coordinates.Y);
+                spawner.gameCanvas.Children.Add(Shape);
+            }
 
-            gameCanvas.Children.Add(food);
+            public void Remove()
+            {
+                spawner.gameCanvas.Children.Remove(Shape);
+                spawner.spawnedFood.Remove(Cell);
+            }
         }
     }
 }

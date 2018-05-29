@@ -66,7 +66,7 @@ namespace SnakeCanvas
             }
 
             snake.Move();
-            //foodSpawner.SpawnFood();
+            foodSpawner.SpawnFood();
             GameInfo.Text = string.Format("Celdas restantes: {0}", gameGrid.RemainingCellCount);
             its++;
         }
