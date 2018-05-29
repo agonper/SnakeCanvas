@@ -23,7 +23,7 @@ namespace SnakeCanvas
         {
             this.gameCanvas = gameCanvas;
             this.gameGrid = gameGrid;
-            this.foodSize = gameGrid.CellSize;
+            foodSize = gameGrid.CellSize;
         }
 
         public bool SpawnFood()

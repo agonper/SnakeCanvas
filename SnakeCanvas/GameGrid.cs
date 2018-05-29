@@ -17,6 +17,7 @@ namespace SnakeCanvas
         public int Height { get; private set; }
         public int CellSize { get; private set; }
         public int CellMargin { get; private set; }
+        private int CellFullSize => CellSize + CellMargin;
 
         public int CellCount => validXPositions.Length * validYPositions.Length;
         public int RemainingCellCount => CellCount - occupiedCoordinates.Count;
@@ -34,9 +35,8 @@ namespace SnakeCanvas
             CellSize = cellSize;
             CellMargin = cellMargin;
 
-            int cellFullSize = cellSize + cellMargin;
-            validXPositions = IntRange(cellMargin, width, cellFullSize);
-            validYPositions = IntRange(cellMargin, height, cellFullSize);
+            validXPositions = IntRange(cellMargin, width, CellFullSize);
+            validYPositions = IntRange(cellMargin, height, CellFullSize);
         }
 
         public Point ClaimRandomCell(int retries = 10)
@@ -59,6 +59,38 @@ namespace SnakeCanvas
             return true;
         }
 
+        public void UnclaimCell(Point cellCoords)
+        {
+            occupiedCoordinates.Remove(cellCoords);
+        }
+
+        public Point GetNeighbourCell(Point cell, Directions direction)
+        {
+            Point neighbour = new Point(cell.X, cell.Y);
+            switch (direction)
+            {
+                case Directions.NORTH:
+                    neighbour.Y += CellFullSize;
+                    break;
+                case Directions.SOUTH:
+                    neighbour.Y -= CellFullSize;
+                    break;
+                case Directions.EAST:
+                    neighbour.X += CellFullSize;
+                    break;
+                case Directions.WEST:
+                    neighbour.X -= CellFullSize;
+                    break;
+            }
+
+            if (neighbour.X < 0 ||
+                neighbour.X >= Width ||
+                neighbour.Y < 0 ||
+                neighbour.Y >= Height)
+                return TheVoid;
+            return neighbour;
+        }
+
         private int[] IntRange(int start, int end, int step)
         {
             var ints = new List<int>();
@@ -67,5 +99,46 @@ namespace SnakeCanvas
         }
     }
 
+    public enum Directions
+    {
+        NORTH, SOUTH, EAST, WEST
+    }
 
+    public static class DirectionsMethods
+    {
+        public static Directions Opposite(this Directions direction)
+        {
+            switch (direction)
+            {
+                case Directions.NORTH:
+                    return Directions.SOUTH;
+                case Directions.SOUTH:
+                    return Directions.NORTH;
+                case Directions.EAST:
+                    return Directions.WEST;
+                default: // WEST
+                    return Directions.EAST;
+            }
+        }
+
+        public static Directions Left(this Directions direction)
+        {
+            switch (direction)
+            {
+                case Directions.NORTH:
+                    return Directions.WEST;
+                case Directions.SOUTH:
+                    return Directions.EAST;
+                case Directions.EAST:
+                    return Directions.NORTH;
+                default: // WEST
+                    return Directions.SOUTH;
+            }
+        }
+
+        public static Directions Right(this Directions direction)
+        {
+            return direction.Left().Opposite();
+        }
+    }
 }

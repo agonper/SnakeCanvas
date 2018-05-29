@@ -21,14 +21,17 @@ namespace SnakeCanvas
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static readonly int gameSpeed = 10;
+        private static readonly int gameSpeed = 100;
 
         private static readonly int gameObjectSize = 10;
         private static readonly int gameObjectMargin = 2;
 
         DispatcherTimer dispatchTimer;
         GameGrid gameGrid;
+        Snake snake;
         FoodSpawner foodSpawner;
+
+        int its = 0;
 
         public MainWindow()
         {
@@ -40,6 +43,10 @@ namespace SnakeCanvas
         {
             dispatchTimer = new DispatcherTimer() { Interval = new TimeSpan(0, 0, 0, 0, gameSpeed) };
             gameGrid = new GameGrid((int)GameCanvas.Width, (int)GameCanvas.Height, gameObjectSize, gameObjectMargin);
+
+            snake = new Snake(GameCanvas, gameGrid);
+            snake.Spawn();
+
             foodSpawner = new FoodSpawner(GameCanvas, gameGrid);
             foodSpawner.SpawnFood();
 
@@ -48,8 +55,20 @@ namespace SnakeCanvas
 
         private void DispatchTimer_Tick(object sender, EventArgs e)
         {
-            foodSpawner.SpawnFood();
+            if (its % 7 == 0)
+            {
+                snake.SteerLeft();
+            }
+
+            if (its % 11 == 0)
+            {
+                snake.SteerRight();
+            }
+
+            snake.Move();
+            //foodSpawner.SpawnFood();
             GameInfo.Text = string.Format("Celdas restantes: {0}", gameGrid.RemainingCellCount);
+            its++;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
