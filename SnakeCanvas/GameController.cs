@@ -10,7 +10,7 @@ namespace SnakeCanvas
 {
     class GameController
     {
-        private static readonly int baseGameSpeed = 1000;
+        private static readonly int baseGameSpeed = 100;
 
         private static readonly int gameObjectSize = 10;
         private static readonly int gameObjectMargin = 2;

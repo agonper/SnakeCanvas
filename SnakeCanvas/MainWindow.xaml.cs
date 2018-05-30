@@ -21,7 +21,7 @@ namespace SnakeCanvas
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static readonly int gameSpeed = 40;
+        private static readonly int gameSpeed = 2;
 
         GameController gameController;
 
