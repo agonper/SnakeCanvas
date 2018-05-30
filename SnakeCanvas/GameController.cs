@@ -10,7 +10,10 @@ namespace SnakeCanvas
 {
     class GameController
     {
+        private static readonly int initialGameSpeedFactor = 1;
         private static readonly int baseGameSpeed = 100;
+        private static readonly int minDifficulty = 1;
+        private static readonly int maxDifficulty = 10;
 
         private static readonly int gameObjectSize = 10;
         private static readonly int gameObjectMargin = 2;
@@ -19,17 +22,37 @@ namespace SnakeCanvas
         public event Action<long> Scored;
         public bool GameStared { get; private set; }
         public long Score { get; private set; }
+        public int GameSpeed
+        {
+            get => _gameSpeed;
+            private set
+            {
+                _gameSpeed = value;
+                UpdateGameSpeed(value);
+            }
+        }
+        public int Difficulty {
+            get => _difficulty;
+            set
+            {
+                if (value < minDifficulty || value > maxDifficulty) return;
+                _difficulty = value;
+            }
+        }
 
         private DispatcherTimer dispatchTimer;
         private GameGrid gameGrid;
         private Snake snake;
         private FoodSpawner foodSpawner;
-
+        private int _gameSpeed;
+        private int _difficulty;
         
 
-        public GameController(Canvas gameCanvas, int gameSpeedFactor)
+        public GameController(Canvas gameCanvas, int difficulty)
         {
-            dispatchTimer = new DispatcherTimer() { Interval = new TimeSpan(0, 0, 0, 0, baseGameSpeed / gameSpeedFactor) };
+            dispatchTimer = new DispatcherTimer();
+            GameSpeed = initialGameSpeedFactor;
+
             gameGrid = new GameGrid((int)gameCanvas.Width, (int)gameCanvas.Height, gameObjectSize, gameObjectMargin);
 
             snake = new Snake(gameCanvas, gameGrid);
@@ -37,6 +60,8 @@ namespace SnakeCanvas
 
             foodSpawner = new FoodSpawner(gameCanvas, gameGrid);
             foodSpawner.SpawnFood();
+
+            Difficulty = difficulty;
 
             dispatchTimer.Tick += DispatchTimer_Tick; ;
         }
@@ -60,6 +85,7 @@ namespace SnakeCanvas
 
             snake.Spawn();
             foodSpawner.SpawnFood();
+            GameSpeed = initialGameSpeedFactor;
             StartGame();
         }
 
@@ -88,11 +114,23 @@ namespace SnakeCanvas
             if (nextIsFood)
             {
                 Score += gameGrid.OccupiedCount;
+                GameSpeed = CalculateSpeedBasedOn(Difficulty);
                 Scored?.Invoke(Score);
             }
 
             snake.Move(grow: nextIsFood);
             foodSpawner.SpawnFood();
+        }
+
+        private int CalculateSpeedBasedOn(int difficulty)
+        {
+            return (int)Math.Ceiling(Math.Log(1+Score, 11 - difficulty));
+        }
+
+        private void UpdateGameSpeed(int factor)
+        {
+            var timeBetweenUpdates = baseGameSpeed / factor;
+            dispatchTimer.Interval = new TimeSpan(0, 0, 0, 0, timeBetweenUpdates);
         }
     }
 }

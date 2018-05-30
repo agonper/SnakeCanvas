@@ -39,6 +39,7 @@ namespace SnakeCanvas
 
         public void Spawn()
         {
+            direction = initialDirection;
             RenderHeadAt(initialHeadPosition);
             var lastBodyPartPosition = head.Cell;
             for (var bp = 0; bp < initialBodyBlocks; bp++)

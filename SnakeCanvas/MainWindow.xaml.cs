@@ -21,7 +21,7 @@ namespace SnakeCanvas
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static readonly int gameSpeed = 2;
+        private static readonly int gameDifficulty = 2;
 
         GameController gameController;
 
@@ -33,7 +33,7 @@ namespace SnakeCanvas
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            gameController = new GameController(GameCanvas, gameSpeed);
+            gameController = new GameController(GameCanvas, gameDifficulty);
             gameController.GameOver += GameController_GameOver;
             gameController.Scored += GameController_Scored;
 
@@ -43,7 +43,7 @@ namespace SnakeCanvas
 
         private void GameController_GameOver()
         {
-            GameInfo.Text = string.Format("Partida Fallida - Puntuación: {0}", gameController.Score);
+            GameInfo.Text = string.Format("¡Lástima! - Puntuación: {0}", gameController.Score);
             MainButton.Content = "Reintentar";
             MainButton.IsEnabled = true;
             gameController.EndGame();
@@ -51,7 +51,7 @@ namespace SnakeCanvas
 
         private void GameController_Scored(long score)
         {
-            UpdateScore(score);
+            UpdateScorePanel(score);
         }
 
         private void GameCanvas_KeyDown(object sender, KeyEventArgs e)
@@ -68,14 +68,14 @@ namespace SnakeCanvas
             if (!gameController.GameStared) gameController.StartGame();
             else gameController.Reset();
 
-            UpdateScore();
+            UpdateScorePanel();
             MainButton.IsEnabled = false;
             GameCanvas.Focus();
         }
 
-        private void UpdateScore(long score = 0)
+        private void UpdateScorePanel(long score = 0)
         {
-            GameInfo.Text = string.Format("Puntuación: {0}", score);
+            GameInfo.Text = string.Format("Puntuación: {0} - Velocidad: x{1}", score, gameController.GameSpeed);
         }
     }
 }
