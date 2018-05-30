@@ -23,29 +23,12 @@
         </TextBlock>
 
         <Canvas Grid.Row="1" Name="GameCanvas" 
-                Height="386" Width="386"
+                Height="386" Width="386" Focusable="True"
                 Background="WhiteSmoke">
-
-
-            <!--<Rectangle Canvas.Left="195" Canvas.Bottom="100"
-                       Height="10" Width="10"
-                       Fill="RosyBrown" Stroke="PaleVioletRed"/>
-            <Rectangle Canvas.Left="183" Canvas.Bottom="100"
-                       Height="10" Width="10"
-                       Fill="LightGreen" Stroke="YellowGreen"/>
-            <Rectangle Canvas.Left="171" Canvas.Bottom="100"
-                       Height="10" Width="10"
-                       Fill="LightGreen" Stroke="YellowGreen"/>
-            <Rectangle Canvas.Left="159" Canvas.Bottom="100"
-                       Height="10" Width="10"
-                       Fill="LightGreen" Stroke="YellowGreen"/>
-            <Rectangle Canvas.Left="147" Canvas.Bottom="100"
-                       Height="10" Width="10"
-                       Fill="LightGreen" Stroke="YellowGreen"/>-->
-
         </Canvas>
 
-        <Button Grid.Row="2" Margin="0,5,0,0" Click="Button_Click"
+        <Button Grid.Row="2" Margin="0,5,0,0" 
+                Click="Button_Click" Name="MainButton"
                 Height="30" FontSize="20">Iniciar</Button>
     </Grid>
     

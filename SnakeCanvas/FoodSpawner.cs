@@ -44,8 +44,18 @@ namespace SnakeCanvas
         {
             if (!spawnedFood.ContainsKey(cell)) return false;
             var food = spawnedFood[cell];
+            spawnedFood.Remove(food.Cell);
             food.Remove();
             return true;
+        }
+
+        public void RemoveAllFood()
+        {
+            foreach (var food in spawnedFood.Values)
+            {
+                food.Remove();
+            }
+            spawnedFood.Clear();
         }
 
         private class Food
@@ -78,7 +88,7 @@ namespace SnakeCanvas
             public void Remove()
             {
                 spawner.gameCanvas.Children.Remove(Shape);
-                spawner.spawnedFood.Remove(Cell);
+                spawner.gameGrid.UnclaimCell(Cell);
             }
         }
     }

@@ -11,8 +11,6 @@ namespace SnakeCanvas
     {
         public static readonly Cell TheVoid = new Cell(-1, -1);
 
-
-
         public int Width { get; private set; }
         public int Height { get; private set; }
         public int CellSize { get; private set; }
@@ -20,7 +18,8 @@ namespace SnakeCanvas
         private int CellFullSize => CellSize + CellMargin;
 
         public int CellCount => validXPositions.Length * validYPositions.Length;
-        public int RemainingCellCount => CellCount - occupiedCoordinates.Count;
+        public int OccupiedCount => occupiedCoordinates.Count;
+        public int RemainingCellCount => CellCount - OccupiedCount;
 
         Random random = new Random();
         ISet<Point> occupiedCoordinates = new HashSet<Point>();
@@ -54,7 +53,7 @@ namespace SnakeCanvas
 
         public bool ClaimCell(Cell cell)
         {
-            if (occupiedCoordinates.Contains(cell.Coordinates)) return false;
+            if (IsOccupied(cell)) return false;
             occupiedCoordinates.Add(cell.Coordinates);
             return true;
         }
@@ -62,6 +61,11 @@ namespace SnakeCanvas
         public void UnclaimCell(Cell cell)
         {
             occupiedCoordinates.Remove(cell.Coordinates);
+        }
+
+        public bool IsOccupied(Cell cell)
+        {
+            return occupiedCoordinates.Contains(cell.Coordinates);
         }
 
         public Cell GetNeighbourCell(Cell cell, Directions direction)

@@ -21,17 +21,9 @@ namespace SnakeCanvas
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static readonly int gameSpeed = 100;
+        private static readonly int gameSpeed = 40;
 
-        private static readonly int gameObjectSize = 10;
-        private static readonly int gameObjectMargin = 2;
-
-        DispatcherTimer dispatchTimer;
-        GameGrid gameGrid;
-        Snake snake;
-        FoodSpawner foodSpawner;
-
-        int its = 0;
+        GameController gameController;
 
         public MainWindow()
         {
@@ -41,39 +33,49 @@ namespace SnakeCanvas
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            dispatchTimer = new DispatcherTimer() { Interval = new TimeSpan(0, 0, 0, 0, gameSpeed) };
-            gameGrid = new GameGrid((int)GameCanvas.Width, (int)GameCanvas.Height, gameObjectSize, gameObjectMargin);
+            gameController = new GameController(GameCanvas, gameSpeed);
+            gameController.GameOver += GameController_GameOver;
+            gameController.Scored += GameController_Scored;
 
-            snake = new Snake(GameCanvas, gameGrid);
-            snake.Spawn();
-
-            foodSpawner = new FoodSpawner(GameCanvas, gameGrid);
-            foodSpawner.SpawnFood();
-
-            dispatchTimer.Tick += DispatchTimer_Tick;
+            GameCanvas.Focus();
+            GameCanvas.KeyDown += GameCanvas_KeyDown;
         }
 
-        private void DispatchTimer_Tick(object sender, EventArgs e)
+        private void GameController_GameOver()
         {
-            if (its % 7 == 0)
-            {
-                snake.SteerLeft();
-            }
+            GameInfo.Text = string.Format("Partida Fallida - Puntuación: {0}", gameController.Score);
+            MainButton.Content = "Reintentar";
+            MainButton.IsEnabled = true;
+            gameController.EndGame();
+        }
 
-            if (its % 11 == 0)
-            {
-                snake.SteerRight();
-            }
+        private void GameController_Scored(long score)
+        {
+            UpdateScore(score);
+        }
 
-            snake.Move();
-            foodSpawner.SpawnFood();
-            GameInfo.Text = string.Format("Celdas restantes: {0}", gameGrid.RemainingCellCount);
-            its++;
+        private void GameCanvas_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Left)
+                gameController.LeftArrowPressed();
+            if (e.Key == Key.Right)
+                gameController.RightArrowPressed();
+            GameCanvas.Focus();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            dispatchTimer.Start();
+            if (!gameController.GameStared) gameController.StartGame();
+            else gameController.Reset();
+
+            UpdateScore();
+            MainButton.IsEnabled = false;
+            GameCanvas.Focus();
+        }
+
+        private void UpdateScore(long score = 0)
+        {
+            GameInfo.Text = string.Format("Puntuación: {0}", score);
         }
     }
 }

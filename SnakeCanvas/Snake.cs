@@ -75,6 +75,16 @@ namespace SnakeCanvas
             direction = direction.Right();
         }
 
+        public void Destroy()
+        {
+            head.Remove();
+            foreach (var block in bodyBlocks)
+            {
+                block.Remove();
+            }
+            bodyBlocks.Clear();
+        }
+
         private bool RenderHeadAt(GameGrid.Cell cell)
         {            
             var head = BodyPart.CreateHead(this, cell);
